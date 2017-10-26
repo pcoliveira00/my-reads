@@ -4,6 +4,22 @@ import Book from './Book'
 
 class Shelf extends Component {
 
+    state = {
+        query: '',
+        result: [],
+    }
+
+    componentDidMount(){
+
+
+    }
+
+    selectNewBook(){
+
+
+    }
+
+
     render(){
         const {title, books, changeShelf } = this.props;
 
