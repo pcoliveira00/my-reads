@@ -1,42 +1,55 @@
-import React, { Component } from 'react'
-import { Link } from 'react-router-dom'
+import React, {Component} from 'react'
+import {Link} from 'react-router-dom'
+import PropTypes from 'prop-types'
 import * as BooksAPI from '../api/BooksAPI'
 import BookList from './BookList'
+import _ from 'lodash';
 
 class Search extends Component {
 
     state = {
         query: '',
         results: []
-    }
+    };
 
     updateQuery = (query) => {
-        query = query.trim()
+        query = query.trim();
 
-        if(query.length > 0){
-            BooksAPI.search(query).then( response => {
-                if(response.length > 0){
-                    this.setState({ query: query, results: response })
+        if (query.length > 0) {
+            BooksAPI.search(query).then(response => {
+                if (response.length > 0) {
+	                const {books} = this.props;
+	                books.forEach((book) => {
+			                response.forEach((resp, index, arr) => {
+			                if (resp.id === book.id) {
+				                arr[index].shelf = book.shelf;
+			                }
+		                })
+	                });
+	                this.setState({
+		                results: response,
+		                query
+	                })
                 }
             })
         }
-    }
+    };
 
-    clearQuery = () => {
-        this.setState({ query: '', results: [] })
-    }
+	componentWillUnmount() {
+		this.setState({ query: '', results: [] })
+	}
 
+    render() {
 
-    render(){
+        const {books, changeShelf} = this.props;
 
-        const { changeShelf } = this.props;
-
-        return(
+        return (
             <div className="search-books">
                 <div className="search-books-bar">
-                    <Link to='/' className="close-search" onClick={() => this.clearQuery()}>Close</Link>
+                    <Link to='/' className="close-search">Close</Link>
                     <div className="search-books-input-wrapper">
-                        <input type="text" placeholder="Search by title or author" onChange={(e)=> this.updateQuery(e.target.value)}/>
+                        <input type="text" placeholder="Search by title or author"
+                               onChange={(e) => this.updateQuery(e.target.value)}/>
                     </div>
                 </div>
                 <div className="search-books-results">
@@ -51,5 +64,10 @@ class Search extends Component {
         )
     }
 }
+
+Search.propTypes = {
+    changeShelf: PropTypes.func.isRequired
+};
+
 
 export default Search;
